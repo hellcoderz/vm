@@ -113,7 +113,19 @@ int main (int argc, char const *argv[]) {
   };
   
   byte instructions[] = {
-    3, 2, 0, 0, 1, 1, 1, 2, 1, 3, 9, 7, 0, 5, 1, 8, 6, 3, 6, 0, 0, 1, 1, 10
+    PUSH_SELF,
+    PUSH_STRING, 0,
+    CALL,        1, 1,
+    PUSH_NUMBER, 2,
+    PUSH_NUMBER, 3,
+    ADD,
+    SET_LOCAL,   0,
+    PUSH_BOOL,   0,
+    JUMP_UNLESS, 6,
+    PUSH_SELF,
+    GET_LOCAL,   0,
+    CALL,        1, 1,
+    RETURN
   };
   
   init_runtime();
