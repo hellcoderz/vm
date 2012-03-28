@@ -56,6 +56,46 @@ void run(void *literals[], byte instructions[]) {
         STACK_PUSH(self);
         break;
       }
+      case PUSH_NIL: {
+        STACK_PUSH(NilObject);
+        break;
+      }
+      case PUSH_BOOL: {
+        ip++;
+        if (*ip == 0) {
+          STACK_PUSH(FalseObject);
+        } else {
+          STACK_PUSH(TrueObject);
+        }
+        break;
+      }
+      case GET_LOCAL: {
+        ip++; // index of local in the locals table
+        STACK_PUSH(locals[*ip]);
+        break;
+      }
+      case SET_LOCAL: {
+        ip++;
+        locals[*ip] = STACK_POP();
+        break;
+      }
+      case ADD: {
+        Object *a = STACK_POP();
+        Object *b = STACK_POP();
+        
+        STACK_PUSH(Number_new(Number_value(a) + Number_value(b)));
+        
+        break;
+      }
+      case JUMP_UNLESS: {
+        ip++; // number of bytes to more forward
+        byte offset = *ip;
+        Object *condition = STACK_POP();
+        
+        if (!Object_is_true(condition)) ip += offset;
+        
+        break;
+      }
       case RETURN: {
         return;
       }
@@ -66,15 +106,14 @@ void run(void *literals[], byte instructions[]) {
 
 int main (int argc, char const *argv[]) {
   void *literals[] = {
-    (void *) "hi",
-    (void *) "print"
+    (void *) "the answer is:",
+    (void *) "print",
+    (void *) 30,
+    (void *) 2
   };
   
   byte instructions[] = {
-    PUSH_SELF,            // [self]
-    PUSH_STRING, 0,       // [self, "hi"]
-    CALL,        1, 1,    // self.print("hi")
-    RETURN
+    3, 2, 0, 0, 1, 1, 1, 2, 1, 3, 9, 7, 0, 5, 1, 8, 6, 3, 6, 0, 0, 1, 1, 10
   };
   
   init_runtime();
